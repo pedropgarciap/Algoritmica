@@ -82,7 +82,7 @@ Data Type: struct timespec
     }
   };
 
-int main()
+/*int main()
 {
 	Clock time;
 	unsigned int a, b;
@@ -102,4 +102,4 @@ int main()
 		std::cout << "Han pasado " << time.elapsed() << "microsegundos \n";
 	}
 	return 0;
-}
+}*/
