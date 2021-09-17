@@ -24,21 +24,27 @@ void guardarFicheroFinal(vector<double> &numeroElementos, vector<double>&tiempos
 
 void ordenacionSeleccion(){
 
-    int nMin, nMax, incremento, repeticiones;
+    int nMin, nMax, incremento, repeticiones, orden;
     vector <double> tiemposReales, numeroElementos, tiemposEstimados;
-    vector<double> a(3);
 
-    cout << "Introduce el numero minimo de elementos: ";
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
+    cout << "\nIntroduce el orden de la matriz de soluciones: (3 para cuadrático): ";
+    cin >> orden;
+
+    vector<double> a(orden);
+
+    cout << "\nIntroduce el numero minimo de elementos: ";
     cin >> nMin;
 
-    cout << "Introduce el numero maximo de elementos: ";
+    cout << "\nIntroduce el numero maximo de elementos: ";
     cin >> nMax;
 
-    cout << "Introduce el numero de incremento de elementos: ";
+    cout << "\nIntroduce el numero de incremento de elementos: ";
     cin >> incremento;
 
-    cout << "Introduce el numero de repeticiones de elementos: ";
+    cout << "\nIntroduce el numero de repeticiones de elementos: ";
     cin >> repeticiones;
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
 
     tiemposOrdenacionSeleccion(nMin, nMax, incremento, repeticiones, tiemposReales, numeroElementos);
 
@@ -50,7 +56,8 @@ void ordenacionSeleccion(){
 
     guardarFicheroEstimados(tiemposEstimados);
 
-    cout << "Coeficiente de determinación: " << calcularCoeficienteDeterminacion(tiemposReales, tiemposEstimados) << endl;
+    cout << "\nCoeficiente de determinación: " << calcularCoeficienteDeterminacion(tiemposReales, tiemposEstimados);
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
 
     guardarFicheroFinal(numeroElementos, tiemposReales, tiemposEstimados);
 }
@@ -103,6 +110,8 @@ void tiemposOrdenacionSeleccion(int nMin, int nMax, int incremento, int repetici
 
     for (int i = nMin; i <= nMax; i+=incremento){
 
+        tiempotranscurrido = 0;
+
         for (int j = 0; j < repeticiones; j++){
             
             vector<int> v(i, 0);
@@ -118,11 +127,13 @@ void tiemposOrdenacionSeleccion(int nMin, int nMax, int incremento, int repetici
             }
         }
 
-        tiemposReales.push_back(tiempotranscurrido/5);
+        tiemposReales.push_back(tiempotranscurrido/repeticiones);
         numeroElementos.push_back(i);
 
         cout << "\nNumero de elementos: " << numeroElementos[numeroElementos.size()-1] << "\tMedia de tiempo por repeticion: " << tiemposReales[tiemposReales.size()-1]  << endl;
     }
+
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
 }
 
 void guardarFichero(vector<double> &numeroElementos, vector<double> &tiemposReales){
@@ -155,16 +166,16 @@ void guardarFicheroFinal(vector<double> &numeroElementos, vector<double>&tiempos
     }
 }
 
-void ajustePolinomico(const vector<double> &numeroElementos, const vector<double> &tiemposReales, vector<double> &a){//preguntar por el orden (3) aqui
+void ajustePolinomico(const vector<double> &numeroElementos, const vector<double> &tiemposReales, vector<double> &a){
 
     vector<vector<double>> matrizDatos;
-    matrizDatos = vector<vector<double>>(3, vector<double>(3));
+    matrizDatos = vector<vector<double>>(a.size(), vector<double>(a.size()));
 
     vector<vector<double>> matrizDatosIndependientes;
-    matrizDatosIndependientes = vector<vector<double>>(3, vector<double>(1));
+    matrizDatosIndependientes = vector<vector<double>>(a.size(), vector<double>(1));
 
     vector<vector<double>> X;
-    X = vector<vector<double>>(3, vector<double>(1));
+    X = vector<vector<double>>(a.size(), vector<double>(1));
 
     for (int i = 0; i < matrizDatos.size(); i++)
     {
@@ -176,14 +187,18 @@ void ajustePolinomico(const vector<double> &numeroElementos, const vector<double
         matrizDatosIndependientes[i][0] = sumatorio(numeroElementos, tiemposReales, i, 1);
     }
 
-    resolverSistemaEcuaciones(matrizDatos, matrizDatosIndependientes, 3, X);
+    resolverSistemaEcuaciones(matrizDatos, matrizDatosIndependientes, a.size(), X);
 
-    for (int i = 0; i < 3; i++)
+    cout << "\nSoluciones: ";
+
+    for (int i = 0; i < a.size(); i++)
     {
         a[i] = X[i][0];
+
+        cout << "[" << a[i] << "]";
     }
     
-    cout << "Soluciones: [" << a[0] << "][" << a[1] << "][" << a[2] << "]" << endl;
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
 }
 
 double sumatorio(const vector<double> &n, const vector<double> &t, int expN, int expT){//preguntar por los const de aqui 
