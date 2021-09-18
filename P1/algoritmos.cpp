@@ -21,6 +21,7 @@ void calcularTiemposEstimadosPolinomico(const vector<double> &numeroElementos, c
 void guardarFicheroEstimados(vector<double> &tiemposEstimados);
 double calcularCoeficienteDeterminacion(const vector<double> &tiemposReales, const vector<double> &tiemposEstimados);
 void guardarFicheroFinal(vector<double> &numeroElementos, vector<double>&tiemposReales, vector<double> &tiemposEstimados);
+double calcularTiempoEstimadoPolinomico(const double &n, vector <double> &a);
 
 void ordenacionSeleccion(){
 
@@ -60,6 +61,19 @@ void ordenacionSeleccion(){
     cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
 
     guardarFicheroFinal(numeroElementos, tiemposReales, tiemposEstimados);
+
+    int n = 1;
+
+    while (n != 0){
+
+        cout << "\nIntroduce un valor de n para el cual realizar una estimación del tiempo que tardaria en procesarse (0 para salir): ";
+        cin >> n;
+
+        if(n != 0){
+
+            cout << "\nLa estimacion de tiempo para el valor introducido es: " << calcularTiempoEstimadoPolinomico(n, a)/1000000 << " segundos.";
+        }
+    }
 }
 
 
@@ -189,13 +203,27 @@ void ajustePolinomico(const vector<double> &numeroElementos, const vector<double
 
     resolverSistemaEcuaciones(matrizDatos, matrizDatosIndependientes, a.size(), X);
 
-    cout << "\nSoluciones: ";
+    cout << "\nRecta: t(n) = ";
 
     for (int i = 0; i < a.size(); i++)
     {
         a[i] = X[i][0];
 
-        cout << "[" << a[i] << "]";
+        if(i == 0){
+
+            cout << a[i];
+        }
+
+        else if (i == 1){
+
+            cout << " + " << a[i] << "*" << "n"; 
+        }
+
+        else{
+
+            cout << " + " << a[i] << "*" << "n^" << i; 
+        }
+        
     }
     
     cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
@@ -216,8 +244,16 @@ double sumatorio(const vector<double> &n, const vector<double> &t, int expN, int
 void calcularTiemposEstimadosPolinomico(const vector<double> &numeroElementos, const vector<double> &a, vector<double> &tiemposEstimados){
 
     for (int i = 0; i < numeroElementos.size(); i++)
-    {
-        tiemposEstimados.push_back(a[0] + a[1]*numeroElementos[i] + (a[2]*pow(numeroElementos[i], 2)));
+    {   
+        double tiempoEstimado = 0;
+
+        for (int j = 0; j < a.size(); j++)
+        {
+            tiempoEstimado+=a[j]*pow(numeroElementos[i], j);
+        }
+        
+        tiemposEstimados.push_back(tiempoEstimado);
+        //tiemposEstimados.push_back(a[0] + a[1]*numeroElementos[i] + (a[2]*pow(numeroElementos[i], 2)));
     }
 }
 
@@ -245,4 +281,16 @@ double calcularCoeficienteDeterminacion(const vector<double> &tiemposReales, con
     varianzaEstimados/=tiemposEstimados.size();
 
     return varianzaEstimados/varianzaReales;
+}
+
+double calcularTiempoEstimadoPolinomico(const double &n, vector <double> &a){
+
+    double estimado = 0;
+
+    for (int i = 0; i < a.size(); i++)
+    {
+        estimado+=(a[i]*pow(n,i));
+    }
+
+    return estimado;
 }
