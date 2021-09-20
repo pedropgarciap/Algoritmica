@@ -1,7 +1,5 @@
 #include "sistemaEcuaciones.hpp"
 
-
-
 using namespace std;
 
 void inicializarInversa(vector < vector < double > >  &inversa);

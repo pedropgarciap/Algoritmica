@@ -34,7 +34,7 @@ int main()
         case 2:
             
             srand(time(0));
-            //productoMatricesCuadradas();
+            productoMatricesCuadradas();
 
             break;
 

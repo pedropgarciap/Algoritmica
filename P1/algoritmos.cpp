@@ -1,27 +1,9 @@
 #include "algoritmos.hpp"
-#include "sistemaEcuaciones.hpp"
-#include "ClaseTiempo.cpp"
-
-#include <vector>
-#include <fstream>
-#include <cmath>  
 
 using namespace std;
 
 int MAXRANGE=10000000;
-
-void rellenarVector(vector<int> &v);
-bool seleccion(vector<int> &v);
-bool estaOrdenado(const vector<int> &v);
-void tiemposOrdenacionSeleccion(int nMin, int nMax, int incremento, int repeticiones, vector<double> &tiemposReales, vector<double> &numeroElementos);
-void guardarFichero(vector<double> &tiemposReales, vector<double> &numeroElementos);
-void ajustePolinomico(const vector<double> &numeroElementos, const vector<double> &tiemposReales, vector<double> &a);
-double sumatorio(const vector<double> &n, const vector<double> &t, int expN, int expT);
-void calcularTiemposEstimadosPolinomico(const vector<double> &numeroElementos, const vector<double> &a, vector<double> &tiemposEstimados);
-void guardarFicheroEstimados(vector<double> &tiemposEstimados);
-double calcularCoeficienteDeterminacion(const vector<double> &tiemposReales, const vector<double> &tiemposEstimados);
-void guardarFicheroFinal(vector<double> &numeroElementos, vector<double>&tiemposReales, vector<double> &tiemposEstimados);
-double calcularTiempoEstimadoPolinomico(const double &n, vector <double> &a);
+double CONVERSION=86400000000;
 
 void ordenacionSeleccion(){
 
@@ -62,7 +44,7 @@ void ordenacionSeleccion(){
 
     guardarFicheroFinal(numeroElementos, tiemposReales, tiemposEstimados);
 
-    int n = 1;
+    double n = 1;
 
     while (n != 0){
 
@@ -71,7 +53,60 @@ void ordenacionSeleccion(){
 
         if(n != 0){
 
-            cout << "\nLa estimacion de tiempo para el valor introducido es: " << calcularTiempoEstimadoPolinomico(n, a)/1000000 << " segundos.";
+            cout << "\nLa estimacion de tiempo para el valor introducido es: " << calcularTiempoEstimadoPolinomico(n, a)/CONVERSION << " dias.";
+        }
+    }
+}
+
+void productoMatricesCuadradas(){
+
+    int nMin, nMax, incremento, repeticiones, orden;
+    vector <double> tiemposReales, numeroElementos, tiemposEstimados;
+
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
+    cout << "\nIntroduce el orden de la matriz de soluciones: (4 para polinomio de grado 3): ";
+    cin >> orden;
+
+    vector<double> a(orden);
+
+    cout << "\nIntroduce el numero minimo de elementos: ";
+    cin >> nMin;
+
+    cout << "\nIntroduce el numero maximo de elementos: ";
+    cin >> nMax;
+
+    cout << "\nIntroduce el numero de incremento de elementos: ";
+    cin >> incremento;
+
+    cout << "\nIntroduce el numero de repeticiones de elementos: ";
+    cin >> repeticiones;
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+
+    tiemposProductoMatrices(nMin, nMax, incremento, repeticiones, tiemposReales, numeroElementos);
+
+    guardarFichero(numeroElementos, tiemposReales);
+
+    ajustePolinomico(numeroElementos, tiemposReales, a);
+
+    calcularTiemposEstimadosPolinomico(numeroElementos, a, tiemposEstimados);
+
+    guardarFicheroEstimados(tiemposEstimados);
+
+    cout << "\nCoeficiente de determinación: " << calcularCoeficienteDeterminacion(tiemposReales, tiemposEstimados);
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+
+    guardarFicheroFinal(numeroElementos, tiemposReales, tiemposEstimados);
+
+    double n = 1;
+
+    while (n != 0){
+
+        cout << "\nIntroduce un valor de n para el cual realizar una estimación del tiempo que tardaria en procesarse (0 para salir): ";
+        cin >> n;
+
+        if(n != 0){
+
+            cout << "\nLa estimacion de tiempo para el valor introducido es: " << calcularTiempoEstimadoPolinomico(n, a)/CONVERSION << " dias.";
         }
     }
 }
@@ -80,7 +115,7 @@ void ordenacionSeleccion(){
 void rellenarVector(vector<int> &v){
 
     for (int i = 0; i < v.size(); i++) {
-        v[i] = rand()%MAXRANGE;
+        
     }
 }
 
@@ -253,7 +288,6 @@ void calcularTiemposEstimadosPolinomico(const vector<double> &numeroElementos, c
         }
         
         tiemposEstimados.push_back(tiempoEstimado);
-        //tiemposEstimados.push_back(a[0] + a[1]*numeroElementos[i] + (a[2]*pow(numeroElementos[i], 2)));
     }
 }
 
@@ -294,3 +328,67 @@ double calcularTiempoEstimadoPolinomico(const double &n, vector <double> &a){
 
     return estimado;
 }
+
+void productoMatrices(vector<vector<double>> &m1, vector<vector<double>> &m2){
+
+    vector<vector<double>> m3(m1.size(), vector<double>(m1.size()));
+
+    for (int i = 0; i < m1.size(); i++)
+    {
+        for (int j = 0; j < m1.size(); j++)
+        {
+            for (int k = 0; k < m1.size(); k++)
+            {
+                m3[i][j] += m1[i][k] * m2[k][j];
+            }
+        }
+        
+    }
+}
+
+void rellenarMatrices(vector<vector<double>> &m1, vector<vector<double>> &m2){
+
+    for (int i = 0; i < m1.size(); i++) {
+
+        for (int j = 0; j < m1.size(); j++)
+        {
+            m1[i][j] = (double)(95 + rand()%11)/100;
+            m2[i][j] = (double)(95 + rand()%11)/100;
+        }
+    }
+}
+
+void tiemposProductoMatrices(int nMin, int nMax, int incremento, int repeticiones, vector<double> &tiemposReales, vector<double> &numeroElementos){
+
+    Clock reloj;
+    double tiempotranscurrido = 0;
+
+    for (int i = nMin; i <= nMax; i+=incremento){
+
+        tiempotranscurrido = 0;
+
+        for (int j = 0; j < repeticiones; j++){
+            
+            vector<vector<double>> m1(i, vector<double>(i));
+            vector<vector<double>> m2(i, vector<double>(i));
+            rellenarMatrices(m1, m2);
+
+            reloj.start();
+            productoMatrices(m1, m2);
+
+            if(reloj.isStarted()){
+
+                reloj.stop();
+                tiempotranscurrido+=reloj.elapsed();   
+            }
+        }
+
+        tiemposReales.push_back(tiempotranscurrido/repeticiones);
+        numeroElementos.push_back(i);
+
+        cout << "\nNumero de elementos: " << numeroElementos[numeroElementos.size()-1] << "\tMedia de tiempo por repeticion: " << tiemposReales[tiemposReales.size()-1]  << endl;
+    }
+
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+}
+
