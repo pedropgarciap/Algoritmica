@@ -111,6 +111,46 @@ void productoMatricesCuadradas(){
     }
 }
 
+void fibonacciRecursivo(){
+
+    int nMin = 0, nMax, incremento = 1;
+    vector <double> tiemposReales, numeroElementos, tiemposEstimados;
+    vector<double> a(2);
+
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
+    cout << "\nIntroduce el termino maximo de la sucesion de fibonacci a calcular: ";
+    cin >> nMax;
+
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+
+    tiemposFibonacci(nMin, nMax, incremento, tiemposReales, numeroElementos);
+
+    guardarFichero(numeroElementos, tiemposReales);
+
+    ajusteExponencial(numeroElementos, tiemposReales, a);
+
+    calcularTiemposEstimadosExponencial(numeroElementos, a, tiemposEstimados);
+
+    guardarFicheroEstimados(tiemposEstimados);
+
+    cout << "\nCoeficiente de determinación: " << calcularCoeficienteDeterminacion(tiemposReales, tiemposEstimados);
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+
+    guardarFicheroFinal(numeroElementos, tiemposReales, tiemposEstimados);
+
+    double n = 1;
+
+    while (n != 0){
+
+        cout << "\nIntroduce un valor de n para el cual realizar una estimación del tiempo que tardaria en procesarse (0 para salir): ";
+        cin >> n;
+
+        if(n != 0){
+
+            cout << "\nLa estimacion de tiempo para el valor introducido es: " << calcularTiempoEstimadoExponencial(n, a)/CONVERSION << " dias.";
+        }
+    }
+}
 
 void rellenarVector(vector<int> &v){
 
@@ -220,8 +260,8 @@ void ajustePolinomico(const vector<double> &numeroElementos, const vector<double
     vector<vector<double>> matrizDatos;
     matrizDatos = vector<vector<double>>(a.size(), vector<double>(a.size()));
 
-    vector<vector<double>> matrizDatosIndependientes;
-    matrizDatosIndependientes = vector<vector<double>>(a.size(), vector<double>(1));
+    vector<vector<double>> matrizDatosDependientes;
+    matrizDatosDependientes = vector<vector<double>>(a.size(), vector<double>(1));
 
     vector<vector<double>> X;
     X = vector<vector<double>>(a.size(), vector<double>(1));
@@ -233,10 +273,10 @@ void ajustePolinomico(const vector<double> &numeroElementos, const vector<double
             matrizDatos[i][j] = sumatorio(numeroElementos, tiemposReales, i+j, 0);
         }
 
-        matrizDatosIndependientes[i][0] = sumatorio(numeroElementos, tiemposReales, i, 1);
+        matrizDatosDependientes[i][0] = sumatorio(numeroElementos, tiemposReales, i, 1);
     }
 
-    resolverSistemaEcuaciones(matrizDatos, matrizDatosIndependientes, a.size(), X);
+    resolverSistemaEcuaciones(matrizDatos, matrizDatosDependientes, a.size(), X);
 
     cout << "\nRecta: t(n) = ";
 
@@ -317,7 +357,7 @@ double calcularCoeficienteDeterminacion(const vector<double> &tiemposReales, con
     return varianzaEstimados/varianzaReales;
 }
 
-double calcularTiempoEstimadoPolinomico(const double &n, vector <double> &a){
+double calcularTiempoEstimadoPolinomico(const double &n, vector <double> &a){//preguntar const a
 
     double estimado = 0;
 
@@ -392,3 +432,138 @@ void tiemposProductoMatrices(int nMin, int nMax, int incremento, int repeticione
     cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
 }
 
+int fibonacci(int x){
+
+    if((x==1)||(x==0)) {
+
+        return(x);
+    }
+
+    else {
+
+        return(fibonacci(x-1)+fibonacci(x-2));
+    }    
+}
+
+void ajusteExponencial(const vector <double> &n, const vector <double> &tiemposReales, vector <double> &a){
+
+    vector<vector<double>> matrizDatos;
+    matrizDatos = vector<vector<double>>(a.size(), vector<double>(a.size()));
+
+    vector<vector<double>> matrizDatosDependientes;
+    matrizDatosDependientes = vector<vector<double>>(a.size(), vector<double>(1));
+
+    vector<vector<double>> X;
+    X = vector<vector<double>>(a.size(), vector<double>(1));
+
+    for (int i = 0; i < matrizDatos.size(); i++)
+    {
+        for (int j = 0; j < matrizDatos[i].size(); j++)
+        {
+            matrizDatos[i][j] = sumatorioExponencial(n, tiemposReales, i+j, 0);
+        }
+
+        matrizDatosDependientes[i][0] = sumatorioExponencial(n, tiemposReales, i, 1);
+    }
+
+    cout << "Matriz independientes: " << endl;
+
+    for (int i = 0; i < matrizDatos.size(); i++)
+    {
+        for (int j = 0; j < matrizDatos.size(); j++)
+        {
+            cout << "[" << matrizDatos[i][j] << "]";
+        }
+        
+        cout << endl;
+    }
+
+    cout << "Matriz dependientes: " << endl;
+
+    for (int i = 0; i < matrizDatosDependientes.size(); i++)
+    {
+        for (int j = 0; j < matrizDatosDependientes[i].size(); j++)
+        {
+            cout << "[" << matrizDatosDependientes[i][j] << "]";
+        }
+    }
+    
+
+    resolverSistemaEcuaciones(matrizDatos, matrizDatosDependientes, matrizDatos.size(), X);
+
+    a[0] = X[0][0];
+    a[1] = X[1][0];
+ 
+
+    cout << "\nRecta: t(n) = " << a[0] << " + " << a[1] << "*2^n";
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
+}
+
+double sumatorioExponencial(const vector<double> &n, const vector<double> &t, int expN, int expT){
+
+    double sumatorio = 0;
+
+    for (int i = 0; i < n.size(); i++)
+    {
+        sumatorio += ((pow(2, (n[i]*expN))) * pow(t[i], expT));
+
+        cout << "Sumatorio: " << sumatorio << endl;
+    }
+
+    return sumatorio;
+}
+
+void calcularTiemposEstimadosExponencial(const vector <double> &n, const vector <double> &a, vector <double> &tiemposEstimados){
+
+    for (int i = 0; i < n.size(); i++)
+    {   
+        double tiempoEstimado = 0;
+
+        for (int j = 0; j < a.size(); j++)
+        {
+            tiempoEstimado+=a[j]*pow(pow(2, n[i]), j);
+        }
+        
+        tiemposEstimados.push_back(tiempoEstimado);
+    }
+}
+
+double calcularTiempoEstimadoExponencial(const double &numeroElementos, const vector <double> &a){
+
+    double estimado = 0;
+
+    for (int i = 0; i < a.size(); i++)
+    {
+        estimado+=(a[i]*pow(pow(2, numeroElementos), i));
+    }
+
+    return estimado;
+}
+
+void tiemposFibonacci(int nMin, int nMax, int incremento, vector<double> &tiemposReales, vector<double> &numeroElementos){
+
+    Clock reloj;
+    double tiempotranscurrido = 0;
+
+    for (int i = nMin; i <= nMax; i+=incremento){
+
+        tiempotranscurrido = 0;
+
+        reloj.start();
+        
+        cout << "Fibonacci: " << fibonacci(i);
+
+        if(reloj.isStarted()){
+
+            reloj.stop();
+            tiempotranscurrido+=reloj.elapsed();   
+        }
+
+        tiemposReales.push_back(tiempotranscurrido);
+        numeroElementos.push_back(i);
+
+        cout << "\nNumero de elementos: " << numeroElementos[numeroElementos.size()-1] << "\tMedia de tiempo por repeticion: " << tiemposReales[tiemposReales.size()-1]  << endl;
+    }
+
+    cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+}

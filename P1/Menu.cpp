@@ -41,7 +41,7 @@ int main()
         case 3:
             
             srand(time(0));
-            //fibonacciRecursivo();
+            fibonacciRecursivo();
 
             break;
         

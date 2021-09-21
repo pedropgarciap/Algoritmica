@@ -32,4 +32,11 @@ void rellenarMatrices(vector<vector<double>> &m1, vector<vector<double>> &m2);
 void productoMatrices(vector<vector<double>> &m1, vector<vector<double>> &m2);
 void tiemposProductoMatrices(int nMin, int nMax, int incremento, int repeticiones, vector<double> &tiemposReales, vector<double> &numeroElementos);
 
+int fibonacci(int x);
+void ajusteExponencial(const vector <double> &n, const vector <double> &tiemposReales, vector <double> &a);
+double sumatorioExponencial(const vector<double> &n, const vector<double> &t, int expN, int expT);
+void calcularTiemposEstimadosExponencial(const vector <double> &n, const vector <double> &a, vector <double> &tiemposEstimados);
+double calcularTiempoEstimadoExponencial(const double &numeroElementos, const vector <double> &a);
+void tiemposFibonacci(int nMin, int nMax, int incremento, vector<double> &tiemposReales, vector<double> &numeroElementos);
+
 #endif
